@@ -16,17 +16,20 @@ import {medicalImagingClient} from "../libs/medicalImagingClient.js";
  * @param {string} imageSetId - The ID of the HealthImaging image set.
  * @param {string} latestVersionId - The ID of the HealthImaging image set version.
  * @param {{}} updateMetadata - The metadata to update.
+ * @param {boolean} force - Force the update.
  */
 export const updateImageSetMetadata = async (datastoreId = "xxxxxxxxxx",
                                              imageSetId = "xxxxxxxxxx",
                                              latestVersionId = "1",
-                                             updateMetadata = '{}') => {
+                                             updateMetadata = '{}',
+                                             force = false) => {
     const response = await medicalImagingClient.send(
         new UpdateImageSetMetadataCommand({
             datastoreId: datastoreId,
             imageSetId: imageSetId,
             latestVersionId: latestVersionId,
-            updateImageSetMetadataUpdates: updateMetadata
+            updateImageSetMetadataUpdates: updateMetadata,
+            force: force,
         })
     );
     console.log(response);
@@ -79,7 +82,7 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
         };
 
         await updateImageSetMetadata(datastoreID, imageSetID,
-            versionID, updateMetadata);
+            versionID, updateMetadata, true);
 // snippet-end:[medical-imaging.JavaScript.datastore.updateImageSetMetadataV3.insert_or_update_attributes]
     } else if (updateType == "remove_attribute") {
         // Remove an existing attribute.
@@ -132,6 +135,16 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
         await updateImageSetMetadata(datastoreID, imageSetID,
             versionID, updateMetadata);
 // snippet-end:[medical-imaging.JavaScript.datastore.updateImageSetMetadataV3.remove_instance]
-    }
+    } else if (updateType == "revert") {
+    // Remove an existing instance.
+// snippet-start:[medical-imaging.JavaScript.datastore.updateImageSetMetadataV3.revert]
+    const updateMetadata = {
+        "revertToVersionId": "1"
+    };
+
+    await updateImageSetMetadata(datastoreID, imageSetID,
+        versionID, updateMetadata);
+// snippet-end:[medical-imaging.JavaScript.datastore.updateImageSetMetadataV3.revert]
+}
 }
 
